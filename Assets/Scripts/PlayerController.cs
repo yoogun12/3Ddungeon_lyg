@@ -6,23 +6,16 @@ using Cinemachine;
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
-
     public float jumpPower = 5f;
-
     public float gravity = -9.81f;
-
-    private CharacterController controller;
-
-    private Vector3 velocity;
-
-    public bool isGrounded;
-
-    private Animator animator;
+    public float rotationSpeed = 10f;
 
     public CinemachineVirtualCamera virtualCam;
 
-    public float rotationSpeed = 10f;
-
+    private CharacterController controller;
+    private Animator animator;
+    private Vector3 velocity;
+    private bool isGrounded;
     private CinemachinePOV pov;
 
     void Start()
@@ -30,20 +23,16 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         pov = virtualCam.GetCinemachineComponent<CinemachinePOV>();
-        //virtual Camera의 POV 컴포넌트 가져오기
     }
 
-    // Update is called once per frame
-    void Update()
+    void Update()
     {
+        // 1. 땅에 있는지 확인하고 중력/점프에 의한 수직 속도 계산
         isGrounded = controller.isGrounded;
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-
-        Vector3 move = new Vector3(x, 0, z);
-        controller.Move(move * speed * Time.deltaTime);
-
-        animator.SetFloat("Speed", move.magnitude);
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f; // 땅에 붙어있도록 살짝 아래로 힘을 줌
+        }
 
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
@@ -51,28 +40,40 @@ public class PlayerController : MonoBehaviour
             animator.SetTrigger("jumpTrigger");
         }
 
-        animator.SetBool("isGrounded", isGrounded);
+        velocity.y += gravity * Time.deltaTime; // 중력 적용
 
+        // 2. 키보드 입력 받기
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
 
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
-
-        //카메라 기준 방향 계산
+        // 3. 카메라 방향 기준으로 실제 이동 방향 계산
         Vector3 camForward = virtualCam.transform.forward;
-        camForward.y = 0;
-        camForward.Normalize();
-
         Vector3 camRight = virtualCam.transform.right;
+        camForward.y = 0; // 높낮이는 무시
+        camRight.y = 0;
+        camForward.Normalize();
         camRight.Normalize();
 
-        Vector3 cmove = (camForward * z + camRight * x).normalized; // 이동 방향 = 카메라 forward/right 기반
-        controller.Move(cmove * speed * Time.deltaTime);
+        Vector3 moveDirection = camForward * z + camRight * x;
 
-        float cameraYaw = pov.m_HorizontalAxis.Value; // 마우스 좌우 회전값
-        Quaternion targetRot = Quaternion.Euler(0f, cameraYaw, 0f); 
-        transform.rotation = Quaternion.Slerp(transform.rotation,targetRot,rotationSpeed * Time.deltaTime);
+        // 4. 계산된 모든 방향(수평, 수직)을 합쳐서 캐릭터를 한번에 이동
+        controller.Move(moveDirection.normalized * speed * Time.deltaTime);
+        controller.Move(velocity * Time.deltaTime); // 수직 이동 적용
 
-        //카메라 중앙쪽으로 보게하는 코드
+        // 애니메이터 파라미터 업데이트
+        animator.SetFloat("Speed", moveDirection.magnitude);
+        animator.SetBool("isGrounded", isGrounded);
+
+        // 5. 캐릭터 회전 처리 (카메라 방향 보도록)
+        // 이동 입력이 있을 때만 캐릭터를 회전시킵니다.
+        if (moveDirection != Vector3.zero)
+        {
+            float cameraYaw = virtualCam.transform.eulerAngles.y;
+            Quaternion targetRot = Quaternion.Euler(0f, cameraYaw, 0f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+        }
+
+        // 6. Tab 키로 카메라 시점 초기화
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             pov.m_HorizontalAxis.Value = transform.eulerAngles.y;
