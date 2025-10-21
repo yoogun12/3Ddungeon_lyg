@@ -18,11 +18,16 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     private CinemachinePOV pov;
 
+    public int maxHP = 100;
+    private int currentHP;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         pov = virtualCam.GetCinemachineComponent<CinemachinePOV>();
+
+        currentHP = maxHP;
     }
 
     void Update()
@@ -79,5 +84,20 @@ public class PlayerController : MonoBehaviour
             pov.m_HorizontalAxis.Value = transform.eulerAngles.y;
             pov.m_VerticalAxis.Value = 0f;
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHP -= damage;
+
+        if (currentHP <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        //플레이어 죽었을때 유다이 뜨게 만들기.
     }
 }

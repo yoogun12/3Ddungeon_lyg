@@ -176,6 +176,7 @@ MonoBehaviour:
   gravity: -9.81
   rotationSpeed: 10
   virtualCam: {fileID: 285074704}
+  maxHP: 100
 --- !u!143 &75090194
 CharacterController:
   m_ObjectHideFlags: 0
@@ -517,7 +518,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 598416870}
-  - component: {fileID: 598416872}
+  - component: {fileID: 598416875}
   - component: {fileID: 598416871}
   - component: {fileID: 598416873}
   - component: {fileID: 598416874}
@@ -571,29 +572,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
---- !u!136 &598416872
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 598416869}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.55
-  m_Height: 3.47
-  m_Direction: 1
-  m_Center: {x: 1.02, y: 1.58, z: 0.91}
 --- !u!114 &598416873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -610,6 +588,12 @@ MonoBehaviour:
   attackRange: 1.5
   attackCooldown: 2
   animator: {fileID: 348724216}
+  maxHP: 5
+  shardPrefab: {fileID: 759285021380020838, guid: 5ae46d6c530237349bc68a08969d0c8b,
+    type: 3}
+  shardCount: 33
+  explosionForce: 1.77
+  explosionRadius: 2
 --- !u!95 &598416874
 Animator:
   serializedVersion: 5
@@ -631,6 +615,27 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!65 &598416875
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598416869}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.04, y: 3.42, z: 0.66}
+  m_Center: {x: 1.01, y: 1.61, z: 0.94}
 --- !u!1 &940937081
 GameObject:
   m_ObjectHideFlags: 0
