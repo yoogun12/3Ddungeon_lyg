@@ -29,36 +29,52 @@ public class Enemy : MonoBehaviour
         currentHP = maxHP;
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        if (player == null || isAttacking) return;
-
-        Vector3 targetPosition = player.position;
-        targetPosition.y = transform.position.y;
-
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        Vector3 move = direction * moveSpeed * Time.deltaTime;
-
-        // Rigidbody로 이동 처리
         Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null)
+        if (player == null || rb == null) return;
+
+        // 공격 중일 때는 수평 이동을 멈춤 (중력은 계속 적용됨)
+        if (isAttacking)
         {
-            rb.MovePosition(transform.position + move);
+            rb.velocity = new Vector3(0, rb.velocity.y, 0);
+            animator.SetFloat("speed", 0); // 속도도 0으로 설정
+            return;
         }
 
-        transform.LookAt(player.position);
-        animator.SetFloat("speed", moveSpeed);
+        // --- 이동 처리 ---
+        Vector3 direction = (player.position - transform.position).normalized;
+        Vector3 targetVelocity = direction * moveSpeed;
+
+        // Y축 속도는 현재 Rigidbody의 값을 그대로 사용 (점프나 중력 유지를 위함)
+        rb.velocity = new Vector3(targetVelocity.x, rb.velocity.y, targetVelocity.z);
+
+        // --- 회전 처리 ---
+        Vector3 lookDir = player.position - transform.position;
+        lookDir.y = 0;
+
+        if (lookDir != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(lookDir);
+        }
+
+        // --- 애니메이터 설정 ---
+        // 수평 속력만 계산하여 애니메이터에 전달
+        Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        animator.SetFloat("speed", horizontalVelocity.magnitude);
     }
 
     //  CharacterController와 충돌 감지용 (Trigger)
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
+        // 플레이어가 공격 범위 안에 머물러 있는 동안
         if (other.CompareTag("Player"))
         {
+            // 공격 쿨타임이 지났다면 다시 공격
             if (Time.time - lastAttackTime >= attackCooldown)
             {
+                lastAttackTime = Time.time; // 공격 직전에 쿨타임 초기화
                 StartCoroutine(AttackRoutine());
-                lastAttackTime = Time.time;
             }
         }
     }
@@ -89,7 +105,7 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
-        Vector3 explosionCenter = transform.position + Vector3.up * 2f;
+        Vector3 explosionCenter = transform.position + Vector3.up * 1f;
 
         for (int i = 0; i < shardCount; i++)
         {
