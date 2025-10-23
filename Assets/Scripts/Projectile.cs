@@ -28,10 +28,16 @@ public class Projectile : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
             Enemy enemy = other.GetComponent<Enemy>();
+            FireEnemy fireEnemy = other.GetComponent<FireEnemy>();
 
             if (enemy != null)
             {
                 enemy.TakeDamage(damage);
+              
+            }
+            if(fireEnemy != null)
+            {
+                fireEnemy.TakeDamage(damage);
             }
 
             // Projectile Á¦°Å
