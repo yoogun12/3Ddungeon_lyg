@@ -29,6 +29,7 @@ public class Projectile : MonoBehaviour
         {
             Enemy enemy = other.GetComponent<Enemy>();
             FireEnemy fireEnemy = other.GetComponent<FireEnemy>();
+            BossEnemy bossEnemy = other.GetComponent<BossEnemy>();
 
             if (enemy != null)
             {
@@ -38,6 +39,11 @@ public class Projectile : MonoBehaviour
             if(fireEnemy != null)
             {
                 fireEnemy.TakeDamage(damage);
+            }
+
+            if(bossEnemy != null)
+            {
+                bossEnemy.TakeDamage(damage);
             }
 
             // Projectile Á¦°Å
