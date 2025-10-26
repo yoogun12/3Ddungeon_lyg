@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FireEnemy : MonoBehaviour
 {
@@ -10,6 +11,9 @@ public class FireEnemy : MonoBehaviour
     public float attackCooldown = 2f;
     private Transform player;
     public Animator animator;
+
+    public Slider hpSlider;
+
 
     // --- 원거리 공격용 변수 추가 (Added variables for ranged attack) ---
     public GameObject projectilePrefab; // 발사할 프리팹
@@ -21,6 +25,7 @@ public class FireEnemy : MonoBehaviour
 
     public int maxHP = 5;
     private int currentHP;
+    private bool isDead = false;
 
     // 죽는 효과
     public GameObject shardPrefab;
@@ -32,6 +37,8 @@ public class FireEnemy : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
         currentHP = maxHP;
+
+        hpSlider.value = 1f;
     }
 
     // 변경점: Update()를 사용하여 거리 체크 및 공격/이동 로직을 관리합니다.
@@ -133,7 +140,10 @@ public class FireEnemy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (isDead) return; // 이미 죽은 적이면 무시
+
         currentHP -= damage;
+        hpSlider.value = (float)currentHP / maxHP;
         if (currentHP <= 0)
         {
             Die();
@@ -142,6 +152,9 @@ public class FireEnemy : MonoBehaviour
 
     void Die()
     {
+        if (isDead) return; // 혹시나 다시 불릴 경우 방지
+        isDead = true;
+
         Vector3 explosionCenter = transform.position + Vector3.up * 1f;
 
         for (int i = 0; i < shardCount; i++)
@@ -155,6 +168,13 @@ public class FireEnemy : MonoBehaviour
             }
             Destroy(shard, 2f);
         }
+
+        GameManager gm = FindObjectOfType<GameManager>();
+        if (gm != null)
+        {
+            gm.AddKill();
+        }
+
         Destroy(gameObject);
     }
 }

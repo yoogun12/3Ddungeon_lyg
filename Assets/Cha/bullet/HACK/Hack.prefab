@@ -98,7 +98,7 @@ MonoBehaviour:
   speed: 10
   homingDuration: 0.8
   turnSpeed: 6
-  damageAmount: 3
+  damageAmount: 5
   shardPrefabs:
   - {fileID: 7891796236437696034, guid: 065534cf8f9fecd478864154c6142d3f, type: 3}
   - {fileID: 3827361012873938847, guid: 982f6eb45572a904383a9c95c8a1dc93, type: 3}

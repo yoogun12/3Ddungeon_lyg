@@ -16,6 +16,14 @@ public class EnemyProjectile : MonoBehaviour
     public void SetDirection(Vector3 dir)
     {
         moveDir = dir.normalized;
+
+        // Rigidbody를 가져와서 중력 끄고 속도 적용
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.useGravity = false;
+            rb.velocity = moveDir * speed;
+        }
     }
     // Start is called before the first frame update
     void Start()

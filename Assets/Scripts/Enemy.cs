@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
@@ -16,6 +17,11 @@ public class Enemy : MonoBehaviour
     public int maxHP = 5;
 
     private int currentHP;
+    private bool isDead = false;
+
+    public int attackDamage = 10;
+
+    public Slider hpSlider;
 
     //죽는 효과
     public GameObject shardPrefab; // 빨간 큐브 프리팹
@@ -27,6 +33,7 @@ public class Enemy : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
         currentHP = maxHP;
+        hpSlider.value = 1f;
     }
 
     void FixedUpdate()
@@ -89,13 +96,26 @@ public class Enemy : MonoBehaviour
 
         // 공격 애니메이션 길이에 맞게 대기
         yield return new WaitForSeconds(1f);
+        if (player != null)
+        {
+            PlayerController playerController = player.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.TakeDamage(attackDamage);
+            }
+        }
+        yield return new WaitForSeconds(1f);
 
         isAttacking = false;
     }
 
     public void TakeDamage(int damage)
     {
+        if (isDead) return; // 이미 죽은 적이면 무시
+
+
         currentHP -= damage;
+        hpSlider.value = (float)currentHP / maxHP;
 
         if (currentHP <= 0)
         {
@@ -105,6 +125,9 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
+        if (isDead) return; // 혹시나 다시 불릴 경우 방지
+        isDead = true;
+
         Vector3 explosionCenter = transform.position + Vector3.up * 1f;
 
         for (int i = 0; i < shardCount; i++)
@@ -121,6 +144,11 @@ public class Enemy : MonoBehaviour
             }
 
             Destroy(shard, 2f);
+        }
+        GameManager gm = FindObjectOfType<GameManager>();
+        if (gm != null)
+        {
+            gm.AddKill();
         }
 
         Destroy(gameObject);

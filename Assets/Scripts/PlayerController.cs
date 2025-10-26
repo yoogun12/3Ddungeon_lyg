@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
 
     private bool isDead = false; // 사망 상태 플래그
     // ------------------------------------------
+    private bool isCursorVisible = false;
 
     void Start()
     {
@@ -50,6 +51,11 @@ public class PlayerController : MonoBehaviour
         // ------------------------------------
 
         hpSlider.value = 1f;
+
+        // 게임 시작 시 커서 숨김
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        isCursorVisible = false;
     }
 
     void Update()
@@ -109,6 +115,20 @@ public class PlayerController : MonoBehaviour
             pov.m_HorizontalAxis.Value = transform.eulerAngles.y;
             pov.m_VerticalAxis.Value = 0f;
         }
+
+        // --- ESC 키로 커서 보이기 ---
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            isCursorVisible = !isCursorVisible; // 토글
+            UpdateCursorState();
+        }
+
+        // --- 마우스 클릭 시 커서 숨기기 ---
+        if (Input.GetMouseButtonDown(0) && isCursorVisible)
+        {
+            isCursorVisible = false;
+            UpdateCursorState();
+        }
     }
 
     public void TakeDamage(int damage)
@@ -135,6 +155,11 @@ public class PlayerController : MonoBehaviour
         isDead = true;
 
         Debug.Log("플레이어가 사망했습니다.");
+
+
+        // 사망 시 커서 보이게 설정
+        isCursorVisible = true;
+        UpdateCursorState();
 
         // TODO: "DieTrigger" 같은 사망 애니메이션 트리거를 설정했다면 여기서 호출
         // animator.SetTrigger("DieTrigger"); 
@@ -179,4 +204,18 @@ public class PlayerController : MonoBehaviour
         gameOverPanel.blocksRaycasts = true;
     }
     // --------------------------------
+
+    private void UpdateCursorState()
+    {
+        if (isCursorVisible)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None; // 자유롭게 이동 가능
+        }
+        else
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked; // 화면 중앙 고정
+        }
+    }
 }

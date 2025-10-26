@@ -1,9 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BossEnemy : MonoBehaviour
 {
+    [Header("¿­¼è ¼³Á¤")]
+    public GameObject keyPrefab;      // ¼ÒÈ¯ÇÒ ¿­¼è ÇÁ¸®ÆÕ
+    public Transform keySpawnPoint;   // ¿­¼è »ý¼º À§Ä¡
+    private bool keySpawned = false;
+
     public float attackRange = 10f;
     public float attackCooldown = 2f;
     private Transform player;
@@ -25,6 +31,8 @@ public class BossEnemy : MonoBehaviour
     public int maxHP = 5;
     private int currentHP;
 
+    public Slider hpSlider;
+
     // Á×´Â È¿°ú
     public GameObject shardPrefab;
     public int shardCount = 10;
@@ -35,6 +43,7 @@ public class BossEnemy : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
         currentHP = maxHP;
+        hpSlider.value = 1f;
     }
 
     void Update()
@@ -95,6 +104,7 @@ public class BossEnemy : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHP -= damage;
+        hpSlider.value = (float)currentHP / maxHP;
         if (currentHP <= 0)
         {
             Die();
@@ -116,6 +126,15 @@ public class BossEnemy : MonoBehaviour
             }
             Destroy(shard, 2f);
         }
+
+        // --- º¸½º »ç¸Á ½Ã ¿­¼è ¼ÒÈ¯ ---
+        if (!keySpawned && keyPrefab != null && keySpawnPoint != null)
+        {
+            Instantiate(keyPrefab, keySpawnPoint.position, Quaternion.identity);
+            keySpawned = true;
+            Debug.Log("º¸½º »ç¸Á! ¿­¼è ¼ÒÈ¯ ¿Ï·á!");
+        }
+
         Destroy(gameObject);
     }
 }
