@@ -1384,7 +1384,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 2
-  attackRange: 10
+  attackRange: 15
   attackCooldown: 2
   animator: {fileID: 4269670567198500695}
   hpSlider: {fileID: 7767718010351549690}
